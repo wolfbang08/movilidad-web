@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect
 import sqlite3
+import os
 
 app = Flask(__name__)
 
@@ -40,26 +41,27 @@ def index():
         cursor.execute("SELECT tiempo FROM desplazamientos")
 
     datos = cursor.fetchall()
-
     conn.close()
 
     tiempos = [d[0] for d in datos]
 
     frecuencia = {}
     for t in tiempos:
-        frecuencia[t] = frecuencia.get(t,0) + 1
+        frecuencia[t] = frecuencia.get(t, 0) + 1
 
     total = len(tiempos)
 
     probabilidades = {}
-    for k,v in frecuencia.items():
-        probabilidades[k] = v/total if total>0 else 0
+    for k, v in frecuencia.items():
+        probabilidades[k] = v / total if total > 0 else 0
 
-    return render_template("index.html",
-                           frecuencia=frecuencia,
-                           probabilidades=probabilidades,
-                           total=total,
-                           filtro=filtro)
+    return render_template(
+        "index.html",
+        frecuencia=frecuencia,
+        probabilidades=probabilidades,
+        total=total,
+        filtro=filtro
+    )
 
 @app.route("/guardar", methods=["POST"])
 def guardar():
@@ -76,7 +78,7 @@ def guardar():
     cursor.execute("""
     INSERT INTO desplazamientos(estudiante,localidad,tiempo,transporte,hora_pico)
     VALUES(?,?,?,?,?)
-    """,(estudiante,localidad,tiempo,transporte,hora_pico))
+    """, (estudiante, localidad, tiempo, transporte, hora_pico))
 
     conn.commit()
     conn.close()
@@ -84,4 +86,5 @@ def guardar():
     return redirect("/")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
