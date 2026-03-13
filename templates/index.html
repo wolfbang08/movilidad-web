@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Movilidad Estudiantil</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<h1>Análisis de Movilidad hacia la Universidad</h1>
+
+<h2>Ingresar datos</h2>
+
+<form action="/guardar" method="POST">
+
+<input type="text" name="estudiante" placeholder="Nombre estudiante" required>
+
+<input type="text" name="localidad" placeholder="Localidad" required>
+
+<input type="number" name="tiempo" placeholder="Tiempo (minutos)" required>
+
+<select name="transporte">
+<option>Bus</option>
+<option>TransMilenio</option>
+<option>Carro</option>
+<option>Moto</option>
+<option>Bicicleta</option>
+<option>Caminar</option>
+</select>
+
+<select name="hora_pico">
+<option>Si</option>
+<option>No</option>
+</select>
+
+<button type="submit">Guardar</button>
+
+</form>
+
+<h2>Filtro por transporte</h2>
+
+<form method="GET">
+
+<select name="transporte">
+
+<option value="">Todos</option>
+<option>Bus</option>
+<option>TransMilenio</option>
+<option>Carro</option>
+<option>Moto</option>
+<option>Bicicleta</option>
+<option>Caminar</option>
+
+</select>
+
+<button type="submit">Filtrar</button>
+
+</form>
+
+<h2>Tabla de probabilidades</h2>
+
+<table border="1">
+
+<tr>
+<th>Tiempo</th>
+<th>Frecuencia</th>
+<th>Probabilidad</th>
+</tr>
+
+{% for t,f in frecuencia.items() %}
+
+<tr>
+<td>{{t}}</td>
+<td>{{f}}</td>
+<td>{{probabilidades[t]}}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<h2>Histograma</h2>
+
+<canvas id="grafica"></canvas>
+
+<script>
+
+var tiempos = {{ frecuencia.keys()|list }};
+var frecuencias = {{ frecuencia.values()|list }};
+
+var ctx = document.getElementById('grafica').getContext('2d');
+
+new Chart(ctx,{
+type:'bar',
+
+data:{
+labels:tiempos,
+datasets:[{
+label:'Frecuencia',
+data:frecuencias
+}]
+}
+
+});
+
+</script>
+
+</body>
+
+</html>
